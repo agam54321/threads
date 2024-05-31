@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String      @id @default(cuid())
+  username    String      @unique
+  name        String
+  image       String?
+  bio         String?
+  threads     Thread[]
+  onboarded   Boolean     @default(false)
+  communities Community[]
+}
+
+model Thread {
+  id          String    @id @default(cuid())
+  text        String
+  author      String
+  user        User      @relation(fields: [author], references: [id])
+  communityId String?
+  community   Community? @relation(fields: [communityId], references: [id])
+  createdAt   DateTime  @default(now())
+  parentId    String?
+  parent      Thread?   @relation("ThreadChildren", fields: [parentId], references: [id])
+  children    Thread[]  @relation("ThreadChildren")
+}
+
+model Community {
+  id      String   @id @default(cuid())
+  userId  String
+  user    User     @relation(fields: [userId], references: [id])
+  threads Thread[]
+}
