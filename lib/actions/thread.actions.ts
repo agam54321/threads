@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "../db/db";
+import { connect } from "http2";
 
 interface Params {
   text: string;
@@ -78,4 +79,61 @@ export async function fetchPosts(pageNumber = 1, pageSize = 20) {
   const isNext = totalPostsCount > skipAmount + posts.length;
 
   return {posts, isNext}
+}
+
+export async function fetchThreadById(threadId: string) {
+ 
+
+  try {
+    const thread = await db.thread.findUnique({
+      where: { id: threadId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+        community: {
+          select: {
+            id: true,
+            // name: true,
+            // image: true,
+          },
+        },
+        children: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                // parentId: true,
+                image: true,
+              },
+            },
+            children: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    // parentId: true,
+                    image: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    console.log(thread);
+    
+    return thread;
+    
+  } catch (err) {
+    console.error("Error while fetching thread:", err);
+    throw new Error("Unable to fetch thread");
+  }
 }
