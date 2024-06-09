@@ -45,6 +45,10 @@ export async function createThread({
   }
 }
 
+
+
+
+
 export async function fetchPosts(pageNumber = 1, pageSize = 20) {
   const skipAmount = (pageNumber - 1) * pageSize;
 
