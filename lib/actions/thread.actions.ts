@@ -181,7 +181,7 @@ export async function addCommentToThread(
 
     // Revalidate the path (e.g., invalidate cache or update the view)
     revalidatePath(path);
-  } catch (err) {
+  } catch (err: any) {
     console.error("Error while adding comment:", err);
     // Add more context to the error
     throw new Error(`Unable to add comment: ${err.message}`);
