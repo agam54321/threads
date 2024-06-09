@@ -45,6 +45,10 @@ export async function createThread({
   }
 }
 
+
+
+
+
 export async function fetchPosts(pageNumber = 1, pageSize = 20) {
   const skipAmount = (pageNumber - 1) * pageSize;
 
@@ -135,5 +139,51 @@ export async function fetchThreadById(threadId: string) {
   } catch (err) {
     console.error("Error while fetching thread:", err);
     throw new Error("Unable to fetch thread");
+  }
+}
+
+
+
+export async function addCommentToThread(
+  threadId: string,
+  commentText: string,
+  userId: string,
+  path: string
+) {
+  try {
+    // Find the original thread by its ID
+    const originalThread = await db.thread.findUnique({
+      where: { id: threadId },
+    });
+
+    if (!originalThread) {
+      throw new Error(`Thread with ID ${threadId} not found`);
+    }
+
+    // Create the new comment thread
+    const savedCommentThread = await db.thread.create({
+      data: {
+        text: commentText,
+        user: { connect: { id: userId } },
+        parent: { connect: { id: threadId } }, // Change from parentId to parent
+      },
+    });
+
+    // Add the comment thread's ID to the original thread's children array
+    await db.thread.update({
+      where: { id: threadId },
+      data: {
+        children: {
+          connect: { id: savedCommentThread.id },
+        },
+      },
+    });
+
+    // Revalidate the path (e.g., invalidate cache or update the view)
+    revalidatePath(path);
+  } catch (err) {
+    console.error("Error while adding comment:", err);
+    // Add more context to the error
+    throw new Error(`Unable to add comment: ${err.message}`);
   }
 }

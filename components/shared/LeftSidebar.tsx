@@ -12,6 +12,7 @@ function LeftSidebar() {
   const sessionId = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const {userId} = useAuth();
 
   const handleSignOut = async () => {
     await signOut();
@@ -25,6 +26,8 @@ function LeftSidebar() {
           const isActive =
             (pathname.includes(link.route) && link.route.length > 1) ||
             pathname === link.route;
+
+            if(link.route ==='/profile') link.route = `${link.route}/${userId}`
           return (
             <Link
               href={link.route}
