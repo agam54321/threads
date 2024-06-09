@@ -97,3 +97,55 @@ export async function fetchUserPosts(userId: string) {
     throw error;
   }
 }
+
+
+export async function fetchUsers({
+  userId,
+  searchString = "",
+  pageNumber = 1,
+  pageSize = 20,
+  sortBy = "desc",
+}: {
+  userId: string;
+  searchString?: string;
+  pageNumber?: number;
+  pageSize?: number;
+  sortBy?: "asc" | "desc";
+}) {
+  try {
+    // Calculate the number of users to skip based on the page number and page size.
+    const skipAmount = (pageNumber - 1) * pageSize;
+
+    // Create a filter object to exclude the current user and optionally filter by search string.
+    const where = {
+      id: { not: userId }, // Exclude the current user
+      OR: searchString
+        ? [
+            { username: { contains: searchString, mode: 'insensitive' } },
+            { name: { contains: searchString, mode: 'insensitive' } },
+          ]
+        : undefined,
+    };
+
+    // Fetch the users with pagination and sorting.
+    const users = await db.user.findMany({
+      where,
+      skip: skipAmount,
+      take: pageSize,
+      orderBy: {
+        // createdAt: sortBy,
+      },
+    });
+
+    // Count the total number of users that match the search criteria (without pagination).
+    const totalUsersCount = await db.user.count({ where });
+
+    // Check if there are more users beyond the current page.
+    const isNext = totalUsersCount > skipAmount + users.length;
+
+    return { users, isNext };
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    throw error;
+  } 
+}
