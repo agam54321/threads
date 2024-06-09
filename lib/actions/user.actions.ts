@@ -149,3 +149,58 @@ export async function fetchUsers({
     throw error;
   } 
 }
+
+
+export async function getActivity(userId: string) {
+  try {
+    // Find all threads created by the user
+    const userThreads = await db.thread.findMany({
+      where: {
+        user: {
+          id: userId
+        }
+      },
+      select: {
+        id: true,
+        children: {
+          select: {
+            id: true
+          }
+        }
+      }
+    });
+
+    // Collect all the child thread ids (replies) from the 'children' field of each user thread
+    const childThreadIds = userThreads.flatMap(userThread => 
+      userThread.children.map(child => child.id)
+    );
+
+    // Find and return the child threads (replies) excluding the ones created by the same user
+    const replies = await db.thread.findMany({
+      where: {
+        id: {
+          in: childThreadIds
+        },
+        user: {
+          id: {
+            not: userId
+          }
+        }
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            image: true,
+            id: true
+          }
+        }
+      }
+    });
+
+    return replies;
+  } catch (error) {
+    console.error("Error fetching replies: ", error);
+    throw error;
+  } 
+}
