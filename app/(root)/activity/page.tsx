@@ -25,7 +25,7 @@ async function Page() {
               <Link key={activity.id} href={`/thread/${activity.parentId}`}>
                 <article className='activity-card'>
                   <Image
-                    src={activity.user.image}
+                    src={activity?.user.image ?? ''}
                     alt='user_logo'
                     width={20}
                     height={20}

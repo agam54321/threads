@@ -5,8 +5,8 @@ interface Props{
     authUserId: string;
     name: string;
     username: string;
-    imgUrl: string;
-    bio: string;
+    imgUrl: string | null;
+    bio: string | null;
 }
 
 const ProfileHeader = ({
@@ -17,7 +17,7 @@ const ProfileHeader = ({
             <div className="flex items-center gap-3">
                 <div className="relative h-20 w-20 object-cover ">
                     <Image
-                    src={imgUrl}
+                    src={imgUrl ? imgUrl : ''}
                     alt="Profile Image"
                     fill
                     className="rounded-full object-cover shadow-2xl"

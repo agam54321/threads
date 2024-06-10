@@ -20,7 +20,7 @@ import { addCommentToThread } from "@/lib/actions/thread.actions";
 import Image from "next/image";
 
 interface Props {
-  threadId: string;
+  threadId: string | undefined;
   currentUserImg: string;
   currentUserId: string;
 }
@@ -28,6 +28,8 @@ interface Props {
 const Comment = ({ threadId, currentUserImg, currentUserId }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
+
+  if(!threadId) return;
   
   const form = useForm({
     resolver: zodResolver(CommentValidation),

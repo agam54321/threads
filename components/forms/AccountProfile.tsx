@@ -26,22 +26,22 @@ import { updateUser } from "@/lib/actions/user.actions";
 
 interface Props {
   user: {
-    id: string;
-    objectId: string;
-    username: string;
+    id: string | '';
+    objectId?: string;
+    username: string | null | undefined;
     name: string;
     bio: string;
-    image: string;
+    image?: string;
   };
   btnTitle: string;
 }
 
 const AccountProfile = ({ user, btnTitle }: Props) => {
-    const [files, setFiles] = useState<File[]>([])
-    const {startUpload} = useUploadThing("media");
-    const router = useRouter();
-    const pathname = usePathname();
- 
+  const [files, setFiles] = useState<File[]>([]);
+  const { startUpload } = useUploadThing("media");
+  const router = useRouter();
+  const pathname = usePathname();
+
   const form = useForm({
     resolver: zodResolver(UserValidation),
     defaultValues: {
@@ -60,33 +60,32 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
 
     const fileReader = new FileReader();
 
-    if(e.target.files && e.target.files.length>0){
-        const file = e.target.files[0];
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
 
-        setFiles(Array.from(e.target.files));
-        if(!file.type.includes('image')) return;
+      setFiles(Array.from(e.target.files));
+      if (!file.type.includes("image")) return;
 
-        fileReader.onload = async(event) =>{
-            const imageDataUrl = event.target?.result?.toString() || '';
-            fieldChange(imageDataUrl);
-        }
+      fileReader.onload = async (event) => {
+        const imageDataUrl = event.target?.result?.toString() || "";
+        fieldChange(imageDataUrl);
+      };
 
-        fileReader.readAsDataURL(file);
-
+      fileReader.readAsDataURL(file);
     }
   };
 
-const onSubmit= async (values: z.infer<typeof UserValidation>) => {
+  const onSubmit = async (values: z.infer<typeof UserValidation>) => {
     const blob = values.profile_photo;
 
     const hasImageChanged = isBase64Image(blob);
 
-    if(hasImageChanged){
-        const imgRes = await startUpload(files)
+    if (hasImageChanged) {
+      const imgRes = await startUpload(files);
 
-        if (imgRes && imgRes[0].fileUrl){
-            values.profile_photo = imgRes[0].fileUrl;
-        }
+      if (imgRes && imgRes[0].fileUrl) {
+        values.profile_photo = imgRes[0].fileUrl;
+      }
     }
 
     await updateUser({
@@ -95,16 +94,15 @@ const onSubmit= async (values: z.infer<typeof UserValidation>) => {
       name: values.name,
       bio: values.bio,
       image: values.profile_photo,
-      path: pathname
+      path: pathname,
     });
 
-    if(pathname === '/profile/edit'){
+    if (pathname === "/profile/edit") {
       router.back();
+    } else {
+      router.push("/");
     }
-    else {
-      router.push('/');
-    }
-  }
+  };
 
   return (
     <Form {...form}>
@@ -147,7 +145,7 @@ const onSubmit= async (values: z.infer<typeof UserValidation>) => {
                   onChange={(e) => handleImage(e, field.onChange)}
                 />
               </FormControl>
-              <FormMessage/>
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -160,19 +158,19 @@ const onSubmit= async (values: z.infer<typeof UserValidation>) => {
               <FormLabel className="text-base-semibold text-light-2">
                 Name
               </FormLabel>
-              <FormControl >
+              <FormControl>
                 <Input
                   type="text"
                   className="account-form_input no-focus"
                   {...field}
                 />
               </FormControl>
-              <FormMessage/>
+              <FormMessage />
             </FormItem>
           )}
         />
 
-<FormField
+        <FormField
           control={form.control}
           name="username"
           render={({ field }) => (
@@ -187,12 +185,12 @@ const onSubmit= async (values: z.infer<typeof UserValidation>) => {
                   {...field}
                 />
               </FormControl>
-              <FormMessage/>
+              <FormMessage />
             </FormItem>
           )}
         />
 
-<FormField
+        <FormField
           control={form.control}
           name="bio"
           render={({ field }) => (
@@ -207,11 +205,13 @@ const onSubmit= async (values: z.infer<typeof UserValidation>) => {
                   {...field}
                 />
               </FormControl>
-              <FormMessage/>
+              <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="bg-primary-500">{btnTitle}</Button>
+        <Button type="submit" className="bg-primary-500">
+          {btnTitle}
+        </Button>
       </form>
     </Form>
   );
