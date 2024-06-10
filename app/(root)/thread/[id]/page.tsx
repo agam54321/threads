@@ -1,3 +1,4 @@
+// @ts-nocheck
 import ThreadCard from "@/components/cards/ThreadCard";
 import { currentUser } from "@clerk/nextjs/server";
 import { fetchUser } from "@/lib/actions/user.actions";

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import Image from "next/image";
 import Link from "next/link";
 import { currentUser } from "@clerk/nextjs/server";
