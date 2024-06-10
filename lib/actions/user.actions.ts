@@ -57,6 +57,9 @@ export async function fetchUser(userId: string) {
       where: {
         id: userId,
       },
+      include:{
+        threads: true
+      }
     });
   } catch (error: any) {
     throw new Error(`Failed to fetch user: ${error.message}`);
@@ -131,7 +134,15 @@ export async function fetchUsers({
 
     // Fetch the users with pagination and sorting.
     const users = await db.user.findMany({
-      where,
+      where : {
+        id: { not: userId }, // Exclude the current user
+        OR: searchString
+          ? [
+              { username: { contains: searchString, mode: 'insensitive' } },
+              { name: { contains: searchString, mode: 'insensitive' } },
+            ]
+          : undefined,
+      },
       skip: skipAmount,
       take: pageSize,
       orderBy: {
@@ -140,7 +151,15 @@ export async function fetchUsers({
     });
 
     // Count the total number of users that match the search criteria (without pagination).
-    const totalUsersCount = await db.user.count({ where });
+    const totalUsersCount = await db.user.count({ where : {
+      id: { not: userId }, // Exclude the current user
+      OR: searchString
+        ? [
+            { username: { contains: searchString, mode: 'insensitive' } },
+            { name: { contains: searchString, mode: 'insensitive' } },
+          ]
+        : undefined,
+    }});
 
     // Check if there are more users beyond the current page.
     const isNext = totalUsersCount > skipAmount + users.length;

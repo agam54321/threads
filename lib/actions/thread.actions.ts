@@ -53,8 +53,9 @@ export async function createThread({
 export async function fetchPosts(pageNumber = 1, pageSize = 20) {
   const skipAmount = (pageNumber - 1) * pageSize;
 
-  const postsQuery = db.thread.findMany({
+  const posts = await db.thread.findMany({
     where: {
+      // parentId: null
       OR: [{ parentId: null }, { parentId: undefined }],
     },
     orderBy: {
@@ -69,17 +70,19 @@ export async function fetchPosts(pageNumber = 1, pageSize = 20) {
           user: true,
         },
       },
+      community: true
     },
     skip: skipAmount,
   });
 
   const totalPostsCount = await db.thread.count({
     where: {
-      OR: [{ parentId: null }, { parentId: undefined }],
+     parentId: null,
     },
+    // where: {
+    //   OR: [{ parentId: null }, { parentId: undefined }],
+    // },
   });
-
-  const posts = await postsQuery;
 
   const isNext = totalPostsCount > skipAmount + posts.length;
 
@@ -182,7 +185,7 @@ export async function addCommentToThread(
 
     // Revalidate the path (e.g., invalidate cache or update the view)
     revalidatePath(path);
-  } catch (err) {
+  } catch (err: any) {
     console.error("Error while adding comment:", err);
     // Add more context to the error
     throw new Error(`Unable to add comment: ${err.message}`);

@@ -18,7 +18,8 @@ model User {
   bio         String?
   threads     Thread[]
   onboarded   Boolean     @default(false)
-  communities Community[]
+  communities Community[] @relation("CommunityMembers")
+  createdCommunities Community[] @relation("CommunityCreator")
 }
 
 model Thread {
@@ -34,9 +35,17 @@ model Thread {
   children    Thread[]  @relation("ThreadChildren")
 }
 
+
 model Community {
-  id      String   @id @default(cuid())
-  userId  String
-  user    User     @relation(fields: [userId], references: [id])
-  threads Thread[]
+  id         String      @id @default(uuid())
+  username   String      @unique
+  name       String
+  image      String?
+  bio        String?
+  createdById String
+  threads    Thread[]
+  members    User[]      @relation("CommunityMembers")
+  createdBy  User        @relation("CommunityCreator", fields: [createdById], references: [id])
+
+  @@index([username])
 }

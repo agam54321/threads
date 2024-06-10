@@ -2,28 +2,36 @@ import { fetchThreadById } from "@/lib/actions/thread.actions";
 import Image from "next/image";
 import Link from "next/link";
 
-interface Props {
-  id: string;
+
+interface ThreadCardProps {
+  key: string | undefined;
+  id: string | undefined;
   currentUserId: string;
-  parentId: string | null;
-  content: string;
+  parentId: string | null | undefined;
+  content: string | undefined;
   user: {
-    name: string;
-    image: string;
     id: string;
+    name: string;
+    image: string | null ;
   };
   community: {
     id: string;
+    username: string;
     name: string;
-    image: string;
+    image?: string | null;
+    bio?: string | null;
+    createdById: string;
   } | null;
-  createdAt: string;
-  comments: {
-    author: {
-      image: string;
-    };
-  }[];
-  isComment: boolean;
+  createdAt: Date | undefined;
+  comments: Array<{
+    id: string;
+    text: string;
+    author: string;
+    communityId: string | null;
+    createdAt: Date;
+    parentId: string | null;
+  }> | undefined;
+  isComment: boolean
 }
 
 
@@ -40,7 +48,7 @@ const ThreadCard = ({
   isComment,
 
   
-}: Props) => {
+}: ThreadCardProps) => {
 
   if (!user) {
     return <div>Loading...</div>; 
@@ -56,7 +64,7 @@ const ThreadCard = ({
           <div className="flex flex-col items-center">
             <Link href={`/profile/${user.id}`} className="relative h-11 w-11">
               <Image
-                src={user.image}
+                src={user.image ?? ''}
                 alt="user_community_image"
                 fill
                 className="cursor-pointer rounded-full"
@@ -108,10 +116,10 @@ const ThreadCard = ({
                 />
               </div>
 
-              {isComment && comments.length > 0 && (
+              {isComment && comments && comments.length > 0 && (
                     <Link href={`/thread/${id}`}>
                         <p className="mt-1 text-subtle-medium text-gray-1">
-                            {comments.length} replies
+                            {comments?.length} replies
                         </p>
                     
                     </Link>
