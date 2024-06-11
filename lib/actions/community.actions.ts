@@ -68,12 +68,12 @@ export async function fetchCommunityPosts(id: string) {
       include: {
         threads: {
           include: {
-            author: {
+            user: {
               select: { name: true, image: true, id: true }
             },
             children: {
               include: {
-                author: {
+                user: {
                   select: { image: true, id: true }
                 }
               }
