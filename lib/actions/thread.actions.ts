@@ -17,7 +17,6 @@ export async function createThread({
   communityId,
   path,
 }: Params) {
-  console.log(text, author);
   try {
     const createThread = await db.thread.create({
       data: {
@@ -40,7 +39,6 @@ export async function createThread({
 
     revalidatePath(path);
   } catch (error: any) {
-    console.log(error);
     throw new Error(`Error creating thread: ${error.message}`);
   }
 }

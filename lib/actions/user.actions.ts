@@ -74,9 +74,9 @@ export async function fetchUserPosts(userId: string) {
           include: {
             community: {
               select: {
-                // name: true,
+                name: true,
                 id: true,
-                // image: true,
+                image: true,
               },
             },
             children: {
