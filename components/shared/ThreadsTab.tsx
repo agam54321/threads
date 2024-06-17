@@ -12,8 +12,6 @@ interface Props{
 
 
 const ThreadsTab = async ({currentUserId, accountId, accountType}: Props) => {
-  console.log("==========================================");
-  console.log(currentUserId, accountId, accountType);
 
     if(!accountId) return;
 

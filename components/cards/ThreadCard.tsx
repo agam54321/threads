@@ -1,4 +1,4 @@
-import { fetchThreadById } from "@/lib/actions/thread.actions";
+// @ts-nocheck
 import { formatDateString } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";

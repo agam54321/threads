@@ -43,9 +43,11 @@ model Community {
   image      String?
   bio        String?
   createdById String
+  createdAt   DateTime    @default(now())
   threads    Thread[]
   members    User[]      @relation("CommunityMembers")
   createdBy  User        @relation("CommunityCreator", fields: [createdById], references: [id])
+
 
   @@index([username])
 }

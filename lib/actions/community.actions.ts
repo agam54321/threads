@@ -1,5 +1,4 @@
 // @ts-nocheck
-
 "use server";
 
 import { db } from "../db/db";
@@ -49,7 +48,8 @@ export async function fetchCommunityDetails(id: string) {
         createdBy: true,
         members: {
           select: { name: true, username: true, image: true, id: true }
-        }
+        },
+        threads: true,
       }
     });
 
@@ -119,7 +119,11 @@ export async function fetchCommunities({
       skip: skipAmount,
       take: pageSize,
       include: {
-        members: true
+        members: {
+          select: {
+            image: true
+          }
+        }
       }
     });
 
